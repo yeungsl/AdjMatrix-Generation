@@ -6,7 +6,6 @@ Author: Sailung Yeung <yeungsl@bu.edu>
 import os
 import sys
 import argparse
-import pickle
 import networkx as nx
 import Conditional_Topology_MAIN as CTM
 from external_tools.community_louvain import generate_dendrogram, partition_at_level
@@ -71,13 +70,19 @@ if __name__ == "__main__":
     args = parse_args()
     filename = args.filename
     noise = args.noise
+    Matsize = 0
     path = os.path.join('data', filename, '')
     graph = CTM.generate_graph(path, filename, -1)
     print("got graph from CTM with", len(graph.nodes()), "nodes and", len(graph.edges()),"edges......")
     graphs = reduce_community(graph, noise)
 
-    com_path = os.path.join(path, 'communities', '')
-    if not os.path.exists(com_path):
-        os.mkdir(com_path)
 
-    #pickle.dump(com, open(com_path+"community_%s.pickle"%com_num,"+wb"))
+    index = 0
+    map_file = open(path+"%s.id_map"%filename, '+w')
+    metis_file = open(path+"%s_%d.metis_graph.part.%d"%(filename, Matsize, len(graphs)), '+w')
+    for g in graphs:
+        for node in g.nodes():
+            map_file.write(str(node) + '\t' + str(index) + '\n')
+            index += 1
+            metis_file.write(str(graphs.index(g)) + '\n')
+
