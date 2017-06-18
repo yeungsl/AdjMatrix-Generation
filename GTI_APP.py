@@ -3,9 +3,7 @@
 """
 Author: Sailung Yeung <yeungsl@bu.edu>
 """
-import os
-import sys
-import argparse
+import os, sys, argparse, pickle
 import networkx as nx
 import Conditional_Topology_MAIN as CTM
 from external_tools.community_louvain import generate_dendrogram, partition_at_level
@@ -71,6 +69,7 @@ if __name__ == "__main__":
     filename = args.filename
     noise = args.noise
     Matsize = 0
+    partition_info = []
     path = os.path.join('data', filename, '')
     graph = CTM.generate_graph(path, filename, -1)
     print("got graph from CTM with", len(graph.nodes()), "nodes and", len(graph.edges()),"edges......")
@@ -86,3 +85,7 @@ if __name__ == "__main__":
             index += 1
             metis_file.write(str(graphs.index(g)) + '\n')
 
+    max_size = CTM.generate_AdjMat(path, graph, Matsize, classNum=1)
+    partition_info.append([len(graphs), max_size])
+
+    pickle.dump(partition_info, open('%s_partition_info.pickle'%filename, '+wb'))
