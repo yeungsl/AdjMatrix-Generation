@@ -10,7 +10,8 @@ import tensorflow as tf
 import time
 import os
 import sys
-import pickle
+import json
+import json_tool
 import glob
 import math
 import networkx as nx
@@ -376,10 +377,10 @@ class Condition_adjMatrix_Generator(object):
 
             graph_name ="%s_%d_%d"%(self.dataset_name, self.inputMat_H,self.trainable_data_size)
             path = os.path.join('data',self.dataset_name,'')
-            Node2Part = pickle.load(open(glob.glob(path+"*_%d.map"%self.inputMat_H)[0],'rb'))
+            Node2Part = json.load(open(glob.glob(path+"*_%d.map"%self.inputMat_H)[0],'r'), object_hook=json_tool.from_json)
 
             weighted_graph = construct_topology(graph_name, each_part, Node2Part)
-            pickle.dump(weighted_graph, open(reconstruct_folder+graph_name+".nxgraph", 'wb'))
+            json.dump(weighted_graph, open(reconstruct_folder+graph_name+".nxgraph", 'w'), default=json_tool.to_json)
 
 
         elif type == "Condition":
@@ -675,8 +676,9 @@ class Condition_adjMatrix_Generator(object):
         degree_file = glob.glob(path+'*_%d.degree'%MatSize)[0]
 
         # 读入adj
-        adj = pickle.load(open(adj_file,'rb'))
-        degree = pickle.load(open(degree_file,'rb'))
+        adj = json.load(open(adj_file,'r'), object_hook=json_tool.from_json)
+        #print('adj #0 has shape', adj[0].shape)
+        degree = json.load(open(degree_file,'r'), object_hook=json_tool.from_json)
         if debugFlag is True:
             print('loaded adj file, adj.keys() = ', len(adj.keys()), end='\t')
             print('loaded degree file, degree.keys() = ', len(degree.keys()), end='\t')

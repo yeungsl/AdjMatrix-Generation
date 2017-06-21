@@ -3,7 +3,7 @@
 """
 Author: Sailung Yeung <yeungsl@bu.edu>
 """
-import os, sys, argparse, pickle
+import os, sys, argparse, json, json_tool
 import networkx as nx
 import Conditional_Topology_MAIN as CTM
 from external_tools.community_louvain import generate_dendrogram, partition_at_level
@@ -88,4 +88,4 @@ if __name__ == "__main__":
     max_size = CTM.generate_AdjMat(path, graph, Matsize, classNum=1)
     partition_info.append([len(graphs), max_size])
 
-    pickle.dump(partition_info, open('%s_partition_info.pickle'%filename, '+wb'))
+    json.dump(partition_info, open('%s_partition_info.json'%filename, 'w'), default=json_tool.to_json)

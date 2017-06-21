@@ -17,7 +17,8 @@
 
 import os
 import glob
-import pickle
+import json
+import json_tool
 import sys
 import numpy as np
 import networkx as nx
@@ -176,10 +177,12 @@ def generate_AdjMat(path, graph, MatSize, classNum):
         print('missing group: ', original_part-check)
 
     # 3. 写文件~
-    pickle.dump(part2Node, open(path+graph.name+'_%d.map'%max_size,'wb'))
-    pickle.dump(adj, open(path+graph.name+'_%d.graph'%max_size,'wb'))
-    pickle.dump(outDegree, open(path+graph.name+'_%d.degree'%max_size,'wb'))
-    pickle.dump(adj_outNeighbor, open(path+graph.name+'_%d.outNeighbor'%max_size,'wb'))
+
+    json.dump(part2Node, open(path+graph.name+'_%d.map'%max_size,'w'), default=json_tool.to_json)
+    json.dump(adj, open(path+graph.name+'_%d.graph'%max_size,'w'), default=json_tool.to_json)
+    print('adj #0 has shape', adj[0].shape)
+    json.dump(outDegree, open(path+graph.name+'_%d.degree'%max_size,'w'), default=json_tool.to_json)
+    json.dump(adj_outNeighbor, open(path+graph.name+'_%d.outNeighbor'%max_size,'w'), default=json_tool.to_json)
 
     if debugFlag is True:
         print('\n\nTopology Processing Down...')

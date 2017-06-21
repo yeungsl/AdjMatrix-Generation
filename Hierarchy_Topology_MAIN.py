@@ -23,7 +23,8 @@ import os
 import sys
 import glob
 import math
-import pickle
+import json
+import json_tool
 
 import Conditional_Topology_MAIN as CTM
 from external_tools.community_louvain import generate_dendrogram
@@ -77,6 +78,6 @@ if __name__ == "__main__":
         os.system('rm %s*.metis_graph'%path)
         os.system('rm %s*.outNeighbor'%path)
 
-    pickle.dump(partition_info, open('%s_partition_info.pickle'%filename,'wb'))
+    json.dump(partition_info, open('%s_partition_info.json'%filename,'w'), default=json_tool.to_json)
     if debugFlag is True:
         print('partion info--[trainable_data_size, inputMatSize]\n\t\t', partition_info)

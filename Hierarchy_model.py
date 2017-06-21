@@ -9,7 +9,8 @@ import numpy as np
 import tensorflow as tf
 import time
 import os
-import pickle
+import json
+import json_tool
 import glob
 import math
 
@@ -29,7 +30,7 @@ class Hierarchy_adjMatrix_Generator(object):
                 batch_size=10,
                 generatorFilter=50, discriminatorFilter=50,
                 generatorFC=1024, discriminatorFC=1024,
-                training_info_dir="facebook_partition_info.pickle",
+                training_info_dir="facebook_partition_info.json",
                 OutDegree_Length=1,
                 inputPartitionDIR="facebook", checkpointDIR="condition_checkpoint", sampleDIR="condition_samples",reconstructDIR="reconstruction",
                 link_possibility=0.5,
@@ -70,7 +71,7 @@ class Hierarchy_adjMatrix_Generator(object):
         self.generatorFC         = generatorFC
         self.discriminatorFC     = discriminatorFC
         # input / output size 初始化
-        train_list = pickle.load(open(training_info_dir,'rb'))
+        train_list = json.load(open(training_info_dir,'r'), object_hook=json_tool.from_json)
         self.trainable_data_size_list = [info[0] for info in train_list]
         self.inputMat_H_list          = [info[1] for info in train_list]
         self.inputMat_W_list          = [info[1] for info in train_list]
@@ -132,7 +133,7 @@ class Hierarchy_adjMatrix_Generator(object):
 
     def modelConstruction(self):
         # step.0 生成Hierarchy GAN 的Adj 以及 原始数据的 GAN
-        if not os.path.exists('%s_adjs.pickle'%self.dataset_name):
+        if not os.path.exists('%s_adjs.json'%self.dataset_name):
             # 1. 读取trained 后的每一层的数据, 并生成 保存于trained_graph_list中
             trained_layer_path = os.path.join(self.reconstructDIR,self.dataset_name,"Hierarchy",'')
             trained_graph_adj_list = []
@@ -140,7 +141,7 @@ class Hierarchy_adjMatrix_Generator(object):
             if debugFlag is True:
                 print('all trained layer paths: ', paths)
             for path in paths:
-                graph = pickle.load(open(path,'rb'))
+                graph = json.load(open(path,'r'), object_hook=json_tool.from_json)
                 if debugFlag is True:
                     print('trained graph size: ',len(graph.nodes()))
                 adj = graph2Adj(graph, max_size = -1)
@@ -157,9 +158,9 @@ class Hierarchy_adjMatrix_Generator(object):
             if debugFlag is True:
                 print('original adj shape: ', origin_adj.shape)
 
-            pickle.dump([trained_graph_adj_list,origin_adj],open('%s_adjs.pickle'%self.dataset_name,'wb'))
+            json.dump([trained_graph_adj_list,origin_adj],open('%s_adjs.json'%self.dataset_name,'w'), default=json_tool.to_json)
         else:
-            [trained_graph_adj_list,origin_adj] = pickle.load(open('%s_adjs.pickle'%self.dataset_name,'rb'))
+            [trained_graph_adj_list,origin_adj] = json.load(open('%s_adjs.json'%self.dataset_name,'r'), object_hook=json_tool.from_json)
             if debugFlag is True:
                 for i in trained_graph_adj_list:
                     print('trained graph ajd shape :', i.shape)

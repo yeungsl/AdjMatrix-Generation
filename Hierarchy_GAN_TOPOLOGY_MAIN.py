@@ -39,7 +39,7 @@ def parse_args():
     parser.add_argument("--discriminator_FC_length",type=int,   default=1024,       help="discriminator fully connected layer length [1024]")
 
     # input/output Adj-Matrix
-    parser.add_argument("--training_info_dir",      type=str,   default="facebook_partition_info.pickle", help="specify trainable_data_size and inputMatSize")
+    parser.add_argument("--training_info_dir",      type=str,   default="facebook_partition_info.json", help="specify trainable_data_size and inputMatSize")
 
     # Out-Degree Vector
     parser.add_argument("--OutDegree_Length",       type=int,   default=1,        help="input degree vector class label length [1]")
@@ -106,7 +106,7 @@ def main(args):
 
 
             # 4. save Model
-            pickle.dump(reconstructed_Adj, open(trained_path+"reconstructed_%s.adj"%args.Dataset,'wb'))
+            json.dump(reconstructed_Adj, open(trained_path+"reconstructed_%s.adj"%args.Dataset,'w'), default=json_tool.to_json)
 
 if __name__ == '__main__':
     main(parse_args())
